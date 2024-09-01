@@ -1,6 +1,6 @@
 # FIA
 
-Assigment for the FIA, the goal is to build two models for Fraud dectection.
+Assignment for the FIA: The goal is to build two models for fraud detection.
 
 ## ⚙️ Installation & Setup
 
