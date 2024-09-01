@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "fia"
+version = "0.1.0"
+description = ""
+authors = ["Maicol Rodrigues <maicol.rodrigues@heyscience.ch>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numba = "^0.60.0"
+shap = "^0.46.0"
+xgboost = "^2.1.1"
+seaborn = "^0.13.2"
+mlflow = "^2.16.0"
+torch = "^2.4.0"
+pytorch-lightning = "^2.4.0"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

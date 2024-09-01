@@ -1,0 +1,15 @@
+artifact_uri: /Users/maicolrodrigues/Documents/Test/FIA/model_trained/mlflow/514800746080220554/a36d73fb4a8747728e2ecfdb9d2eed1c/artifacts
+end_time: 1725180891138
+entry_point_name: ''
+experiment_id: '514800746080220554'
+lifecycle_stage: active
+run_id: a36d73fb4a8747728e2ecfdb9d2eed1c
+run_name: '20240831_2349'
+run_uuid: a36d73fb4a8747728e2ecfdb9d2eed1c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1725144557263
+status: 3
+tags: []
+user_id: maicolrodrigues
