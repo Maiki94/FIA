@@ -46,7 +46,7 @@ class DataModule(LightningDataModule):
         test_df: pd.DataFrame,
         batch_size: int = 32,
         random_sate: int = 42,
-        num_workers: int = int(os.cpu_count()*0.8),
+        num_workers: int = os.cpu_count(),
         persistent_workers: bool = True,
         prefetch_factor: int = 2,
     ):

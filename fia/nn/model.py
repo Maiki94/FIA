@@ -8,13 +8,11 @@ from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer, Adam
 from torchmetrics import (
     MetricCollection,
-    PrecisionRecallCurve,
     Accuracy,
     Recall,
     Precision,
 )
 from pytorch_lightning import LightningModule
-
 
 from fia.nn.classifier import FraudDetectionModel
 
@@ -39,7 +37,7 @@ class LightningFraudClassifier(LightningModule):
 
         self.metrics = metrics
         self.model = model
-        self.critirion = criterion
+        self.criterion = criterion
 
         self.train_metrics = metrics.clone(prefix="train_")
         self.val_metrics = metrics.clone(prefix="val_")
@@ -66,62 +64,61 @@ class LightningFraudClassifier(LightningModule):
         return metrics
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        # print(f"Inputs Shape: {inputs.shape}")
         return self.model(inputs)
 
     def step(self, batch: tuple[torch.Tensor, torch.Tensor]):
         inputs, targets = batch
-        logits = self.forward(inputs)
-        targets = targets.view(-1, 1)
+        logits = self.forward(inputs).squeeze()
+        targets = targets.long()
 
-        loss = self.critirion(logits, targets)
-        preds = torch.argmax(logits, dim=1)
-        probs = torch.softmax(logits, dim=1)
+        loss = self.criterion(logits, targets.float())
+        probs = torch.sigmoid(logits)
 
-        return loss, preds, probs, targets
+        return loss, probs, targets
 
     def training_step(self, batch: tuple[torch.Tensor, torch.Tensor]):
-        loss, preds, probs, targets = self.step(batch=batch)
+        loss, probs, targets = self.step(batch=batch)
         self.log(name="train_loss", value=loss, on_step=False, on_epoch=True)
-        self.log_dict(
-            dictionary=self.train_metrics(probs, targets), on_step=False, on_epoch=True
-        )
+        self.train_metrics.update(probs, targets)
 
-        return {
-            "loss": loss,
-            "preds": preds,
-            "probs": probs.detach(),
-            "target": targets,
-        }
+        return loss
+    
+    def on_train_epoch_end(self):
+        # Compute and log metrics
+        metrics = self.train_metrics.compute()
+        self.log_dict(metrics, on_epoch=True)
+        self.train_metrics.reset()
 
     def validation_step(self, batch: tuple[torch.Tensor, torch.Tensor]):
-        loss, preds, probs, targets = self.step(batch=batch)
+        loss, probs, targets = self.step(batch=batch)
         self.log(name="val_loss", value=loss, on_step=False, on_epoch=True)
-        self.log_dict(
-            dictionary=self.val_metrics(probs, targets), on_step=False, on_epoch=True
-        )
-
-        return {
-            "loss": loss,
-            "preds": preds,
-            "probs": probs.detach(),
-            "target": targets,
-        }
+        self.val_metrics.update(probs, targets)
+        return loss
+    
+    def on_validation_epoch_end(self):
+        # Compute and log metrics
+        metrics = self.val_metrics.compute()
+        self.log_dict(metrics, on_epoch=True)
+        self.val_metrics.reset()
 
     def test_step(self, batch: tuple[torch.Tensor, torch.Tensor]):
-        loss, preds, probs, targets = self.step(batch=batch)
+        loss, probs, targets = self.step(batch=batch)
         self.log(name="test_loss", value=loss, on_step=False, on_epoch=True)
-        self.log_dict(
-            dictionary=self.test_metrics(probs, targets), on_step=False, on_epoch=True
-        )
+
+        self.test_metrics.update(probs, targets)
 
         return {
             "loss": loss,
-            "preds": preds,
             "probs": probs.detach(),
             "target": targets,
         }
+    
+    def on_test_epoch_end(self):
+        # Compute and log metrics
+        metrics = self.test_metrics.compute()
+        self.log_dict(metrics, on_epoch=True)
+        self.test_metrics.reset()
+
 
     def configure_optimizers(self) -> Optimizer:
         return Adam(self.parameters())
-    

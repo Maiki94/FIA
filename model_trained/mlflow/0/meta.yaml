@@ -1,6 +1,6 @@
-artifact_location: /Users/maicolrodrigues/Documents/Test/FIA/model_trained/mlflow/0
-creation_time: 1725142393527
+artifact_location: file:///c:/Users/rodri/Documents/AI/FIA/model_trained/mlflow/0
+creation_time: 1726233897772
 experiment_id: '0'
-last_update_time: 1725142393527
+last_update_time: 1726233897772
 lifecycle_stage: active
 name: Default

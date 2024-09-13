@@ -55,9 +55,8 @@ def get_f1_score_metrics(num_classes: int):
 
 def get_accuracy_metrics(num_classes: int):
     return {
-        "accuracy_macro": Accuracy(
-            num_classes=num_classes, average="macro", task="binary"
-        ),
+        "accuracy_weighted": Accuracy(
+            num_classes=num_classes, average="weighted", task="binary")
     }
 
 
